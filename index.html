@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PharmaStock — Sistema de Gestão de Estoque</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/tabler-icons.min.css">
+  <style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1a7a4a;--gl:#e8f5ee;--gd:#0f5c35;
+  --b:#1a5fa8;--bl:#e8f0fb;
+  --a:#c47a15;--al:#fff4e0;
+  --r:#c0392b;--rl:#fdecea;
+  --pu:#534AB7;--pul:#EEEDFE;
+  --s:var(--color-background-primary);
+  --s2:var(--color-background-secondary);
+  --bd:var(--color-border-tertiary);
+  --t:var(--color-text-primary);
+  --m:var(--color-text-secondary);
+  --mono:'IBM Plex Mono',monospace;
+  --sans:var(--font-sans);
+}
+body{font-family:var(--sans);color:var(--t)}
+.app{max-width:580px;margin:0 auto;padding-bottom:32px}
+.hdr{background:var(--g);color:#fff;padding:14px 16px 12px;position:sticky;top:0;z-index:100}
+.hdr-row{display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--mono);font-size:10px;letter-spacing:.12em;opacity:.7}
+.hdr h1{font-size:18px;font-weight:500;margin-top:1px}
+.nbadge{background:#f5c842;color:#1a1a1a;border-radius:50%;width:19px;height:19px;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.nav{display:flex;background:var(--s);border-bottom:.5px solid var(--bd);overflow-x:auto;scrollbar-width:none;position:sticky;top:58px;z-index:99}
+.nav::-webkit-scrollbar{display:none}
+.nb{flex:none;padding:9px 13px;font-size:12px;font-weight:500;color:var(--m);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.nb.on{color:var(--g);border-bottom-color:var(--g)}
+.pg{display:none;padding:14px}
+.pg.on{display:block}
+.st{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--m);margin:16px 0 8px}
+.st:first-child{margin-top:0}
+.card{background:var(--s);border:.5px solid var(--bd);border-radius:12px;padding:13px;margin-bottom:10px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px}
+.metric{background:var(--s2);border-radius:9px;padding:9px 10px}
+.mv{font-size:20px;font-weight:500;font-family:var(--mono);line-height:1.1}
+.ml{font-size:10px;color:var(--m);margin-top:3px}
+.mv.g{color:var(--g)}.mv.b{color:var(--b)}.mv.pu{color:var(--pu)}.mv.r{color:var(--r)}.mv.a{color:var(--a)}
+
+.badge{font-family:var(--mono);font-size:10px;font-weight:500;padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0}
+.bg{background:var(--gl);color:#1a5c32}.bb{background:var(--bl);color:#0c447c}
+.bp{background:var(--pul);color:#3C3489}.bo{background:var(--al);color:#633806}
+.br{background:var(--rl);color:#791F1F}.bgr{background:var(--s2);color:var(--m)}
+
+.ir{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:.5px solid var(--bd)}
+.ir:last-child{border-bottom:none}
+.il{font-size:12px;color:var(--m);flex:1}
+.iv{font-family:var(--mono);font-size:12px;font-weight:500}
+
+.fi{font-size:12px;font-weight:500;color:var(--m);margin-bottom:4px;display:block}
+input.inp,select.inp{width:100%;padding:9px 11px;font-size:13px;background:var(--s);border:.5px solid var(--bd);border-radius:8px;color:var(--t);outline:none;font-family:var(--sans)}
+input.inp:focus,select.inp:focus{border-color:var(--g)}
+select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath fill='%23888' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:26px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.fg{margin-bottom:10px}
+.btn{width:100%;padding:10px;background:var(--g);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--sans)}
+.btn:active{opacity:.85}
+.btn.pu{background:var(--pu)}
+.btn.outline{background:none;color:var(--g);border:.5px solid var(--g)}
+.btn.sm{padding:7px 12px;width:auto;font-size:12px}
+
+.addr-box{background:var(--s2);border-radius:9px;padding:11px;text-align:center;margin-bottom:11px}
+.addr-big{font-family:var(--mono);font-size:18px;font-weight:500;letter-spacing:.05em;margin:3px 0 2px}
+.addr-big.baia{color:var(--g)}.addr-big.palete{color:var(--pu)}
+.addr-lbl{font-size:10px;color:var(--m)}
+
+.stab-row{display:flex;gap:7px;margin-bottom:13px}
+.stab{flex:1;padding:9px;text-align:center;border-radius:9px;border:1.5px solid var(--bd);background:var(--s);cursor:pointer;font-weight:500;font-size:12px;color:var(--m);transition:all .15s}
+.stab.baia{border-color:transparent;background:var(--gl);color:var(--g)}
+.stab.palete{border-color:transparent;background:var(--pul);color:var(--pu)}
+.stab-ic{font-size:18px;display:block;margin-bottom:2px}
+
+.alert-card{border-radius:9px;padding:10px 12px;margin-bottom:7px;display:flex;gap:9px;align-items:flex-start}
+.alert-card.warn{background:var(--al);color:var(--a)}
+.alert-card.danger{background:var(--rl);color:var(--r)}
+.alert-card i{font-size:16px;flex-shrink:0;margin-top:1px}
+.alert-title{font-weight:500;font-size:12px}
+.alert-desc{font-size:11px;margin-top:2px;opacity:.85}
+
+.hist-item{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:.5px solid var(--bd)}
+.hist-item:last-child{border-bottom:none}
+.hdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.hdot.in{background:var(--g)}.hdot.out{background:var(--r)}
+.hi{flex:1;min-width:0}
+.hn{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm{font-size:10px;color:var(--m)}
+.hq{font-family:var(--mono);font-size:12px;font-weight:500}
+.hq.in{color:var(--g)}.hq.out{color:var(--r)}
+
+.prod-card{background:var(--s);border:.5px solid var(--bd);border-radius:10px;padding:11px;margin-bottom:8px}
+.pc-top{display:flex;align-items:center;gap:8px}
+.pc-info{flex:1;min-width:0}
+.pc-name{font-weight:500;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-sub{font-size:11px;color:var(--m);margin-top:1px;font-family:var(--mono)}
+.sbar{margin-top:7px}
+.sbar-bg{height:3px;background:var(--s2);border-radius:2px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:2px}
+.sbar-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--m);margin-top:3px}
+
+.upload-zone{border:1.5px dashed var(--bd);border-radius:12px;padding:28px 16px;text-align:center;cursor:pointer;transition:border-color .2s;position:relative;margin-bottom:12px}
+.upload-zone:hover{border-color:var(--g)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.uz-icon{font-size:32px;color:var(--m);display:block;margin-bottom:8px}
+.uz-title{font-size:14px;font-weight:500;color:var(--t)}
+.uz-sub{font-size:11px;color:var(--m);margin-top:3px}
+
+.conv-row{display:flex;align-items:center;gap:8px;padding:8px;background:var(--s2);border-radius:8px;margin-bottom:6px;font-size:11px}
+.conv-old{font-family:var(--mono);color:var(--m);flex:1}
+.conv-arrow{color:var(--g);font-size:14px}
+.conv-new{font-family:var(--mono);color:var(--g);font-weight:500;flex:1;text-align:right}
+
+.imp-table{width:100%;font-size:11px;border-collapse:collapse}
+.imp-table th{text-align:left;padding:6px 8px;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--m);border-bottom:.5px solid var(--bd)}
+.imp-table td{padding:7px 8px;border-bottom:.5px solid var(--bd);vertical-align:middle}
+.imp-table tr:last-child td{border-bottom:none}
+.imp-table tr:hover td{background:var(--s2)}
+
+.baia-grid-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
+.bcell{border-radius:5px;border:.5px solid var(--bd);font-size:9px;font-family:var(--mono);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:5px 2px;gap:1px;transition:transform .1s}
+.bcell:active{transform:scale(.94)}
+.bcell.empty{background:var(--s2);color:var(--m)}
+.bcell.ok{background:var(--gl);color:#1a5c32;border-color:transparent}
+.bcell.warn{background:var(--al);color:#633806;border-color:transparent}
+.bcell-name{font-size:8px;font-weight:500;max-width:54px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+.bcell-addr{font-size:7px;opacity:.65}
+
+.pal-porta{border:.5px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.pal-phdr{background:var(--pul);color:#3C3489;padding:8px 12px;font-size:11px;font-weight:500;display:flex;justify-content:space-between;align-items:center}
+.pal-pgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;padding:9px}
+.pal-cell{aspect-ratio:1;border-radius:5px;border:.5px solid var(--bd);font-size:8px;font-family:var(--mono);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:1px;padding:2px}
+.pal-cell:active{transform:scale(.94)}
+.pal-cell.empty{background:var(--s2);color:var(--m)}
+.pal-cell.ok{background:var(--pul);color:#3C3489;border-color:transparent}
+
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.li{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--m)}
+.ld{width:9px;height:9px;border-radius:2px}
+
+.search-w{position:relative;margin-bottom:10px}
+.si{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--m);font-size:14px}
+.search-w .inp{padding-left:29px}
+
+.toast{background:#1a1a1a;color:#fff;padding:8px 16px;border-radius:18px;font-size:12px;font-weight:500;opacity:0;transition:all .25s;position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(10px);white-space:nowrap;z-index:500;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.move-btns{display:flex;gap:7px;margin-bottom:14px}
+.mov-btn{flex:1;padding:9px;text-align:center;border-radius:9px;border:1.5px solid var(--bd);background:var(--s);cursor:pointer;font-weight:500;font-size:12px;color:var(--m)}
+.mov-btn i{display:block;font-size:18px;margin-bottom:2px}
+.mov-btn.entrada{border-color:transparent;background:var(--gl);color:var(--g)}
+.mov-btn.saida{border-color:transparent;background:var(--rl);color:var(--r)}
+
+.setup-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px}
+.setup-box{background:var(--s);border-radius:16px;padding:24px;max-width:400px;width:100%}
+.setup-box h2{font-size:18px;font-weight:600;margin-bottom:12px}
+.setup-box p{font-size:13px;color:var(--m);margin-bottom:16px;line-height:1.5}
+.setup-box .fg{margin-bottom:12px}
+.setup-box .btn{margin-top:16px}
+  </style>
+</head>
+<body>
+
+<div class="app">
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden">PharmaStock — sistema integrado de gestão de estoque e endereçamento farmacêutico</h2>
+
+<div class="hdr">
+  <div class="hdr-row">
+    <span class="logo">PHARMASTOCK v2</span>
+    <div class="nbadge" id="nbadge">0</div>
+  </div>
+  <h1>Gestão de estoque</h1>
+</div>
+
+<nav class="nav">
+  <button class="nb on" onclick="nav('dash',this)"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Início</button>
+  <button class="nb" onclick="nav('produtos',this)"><i class="ti ti-pill" aria-hidden="true"></i>Produtos</button>
+  <button class="nb" onclick="nav('mov',this)"><i class="ti ti-arrows-exchange" aria-hidden="true"></i>Movim.</button>
+  <button class="nb" onclick="nav('baias',this)"><i class="ti ti-grid-dots" aria-hidden="true"></i>Baias</button>
+  <button class="nb" onclick="nav('paletes',this)"><i class="ti ti-stack" aria-hidden="true"></i>Paletes</button>
+  <button class="nb" onclick="nav('importar',this)"><i class="ti ti-file-upload" aria-hidden="true"></i>Importar</button>
+</nav>
+
+<!-- DASHBOARD -->
+<div class="pg on" id="pg-dash">
+  <div class="metrics">
+    <div class="metric"><div class="mv b" id="m-total">0</div><div class="ml">Produtos</div></div>
+    <div class="metric"><div class="mv r" id="m-alert">0</div><div class="ml">Alertas</div></div>
+    <div class="metric"><div class="mv g" id="m-baias">0</div><div class="ml">Baias livres</div></div>
+    <div class="metric"><div class="mv pu" id="m-pals">0</div><div class="ml">Pal. livres</div></div>
+  </div>
+
+  <p class="st">Alertas de estoque</p>
+  <div id="dash-alertas"><div style="font-size:12px;color:var(--m);text-align:center;padding:16px">Nenhum alerta ativo</div></div>
+
+  <p class="st">Últimas movimentações</p>
+  <div class="card" style="padding:9px 13px" id="dash-hist">
+    <div style="font-size:12px;color:var(--m);text-align:center;padding:10px">Nenhuma movimentação ainda</div>
+  </div>
+
+  <p class="st">Endereçamento — legenda</p>
+  <div class="card" style="padding:10px 13px">
+    <div class="ir"><span class="il"><i class="ti ti-grid-dots" aria-hidden="true" style="font-size:13px;margin-right:4px"></i>Baia (tiragem)</span><span class="iv" style="color:var(--g);font-size:11px">N001 · B3 · P2</span></div>
+    <div class="ir"><span class="il"><i class="ti ti-stack" aria-hidden="true" style="font-size:13px;margin-right:4px"></i>Palete (embarque)</span><span class="iv" style="color:var(--pu);font-size:11px">PP1 · P08</span></div>
+    <div class="ir"><span class="il"><i class="ti ti-refresh" aria-hidden="true" style="font-size:13px;margin-right:4px"></i>Conversão de endereço</span><span class="iv" style="font-size:11px">R→N | C→Col | B→Band</span></div>
+  </div>
+</div>
+
+<!-- PRODUTOS -->
+<div class="pg" id="pg-produtos">
+  <div class="search-w">
+    <i class="ti ti-search si" aria-hidden="true"></i>
+    <input class="inp search-w" style="padding-left:29px;width:100%" type="search" placeholder="Buscar por nome, SKU ou endereço..." oninput="filtrarProd(this.value)" id="search-prod">
+  </div>
+  <div id="lista-prod"></div>
+</div>
+
+<!-- MOVIMENTAÇÃO -->
+<div class="pg" id="pg-mov">
+  <div class="move-btns">
+    <div class="mov-btn entrada" id="mbtn-in" onclick="setMov('entrada')"><i class="ti ti-arrow-down-circle" aria-hidden="true"></i>Entrada</div>
+    <div class="mov-btn" id="mbtn-out" onclick="setMov('saida')"><i class="ti ti-arrow-up-circle" aria-hidden="true"></i>Saída</div>
+  </div>
+  <div class="fg"><label class="fi">Produto</label>
+    <select class="inp" id="mov-prod" onchange="onMovProd()">
+      <option value="">Selecione...</option>
+    </select>
+  </div>
+  <div class="card" id="mov-addr-card" style="display:none;margin-bottom:10px">
+    <div style="font-size:10px;color:var(--m);margin-bottom:4px">Endereço</div>
+    <div id="mov-addr-show" style="font-family:var(--mono);font-size:16px;font-weight:500;color:var(--g)"></div>
+  </div>
+  <div class="frow">
+    <div class="fg"><label class="fi">Quantidade</label><input class="inp" type="number" min="1" id="mov-qtd" placeholder="0"></div>
+    <div class="fg"><label class="fi">Lote / Obs.</label><input class="inp" type="text" id="mov-lote" placeholder="LOT2024-01"></div>
+  </div>
+  <button class="btn" onclick="registrarMov()">Registrar movimentação</button>
+  <p class="st" style="margin-top:18px">Histórico do dia</p>
+  <div class="card" style="padding:9px 13px" id="mov-hist">
+    <div style="font-size:12px;color:var(--m);text-align:center;padding:10px">Nenhuma movimentação hoje</div>
+  </div>
+</div>
+
+<!-- BAIAS -->
+<div class="pg" id="pg-baias">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <label class="fi" style="margin:0;white-space:nowrap;font-size:12px">Coluna N:</label>
+    <select class="inp" id="sel-col" onchange="renderBaias()" style="flex:1"></select>
+  </div>
+  <div class="legend">
+    <div class="li"><div class="ld" style="background:var(--gl);border:1px solid #2da05f"></div>Ocupada</div>
+    <div class="li"><div class="ld" style="background:var(--al);border:1px solid var(--a)"></div>Alerta</div>
+    <div class="li"><div class="ld" style="background:var(--s2);border:.5px solid var(--bd)"></div>Vazia</div>
+  </div>
+  <div class="card" id="baia-det" style="display:none;margin-bottom:9px;border-color:var(--g)">
+    <div style="font-size:11px;font-weight:500;color:var(--g);margin-bottom:7px">Posição selecionada</div>
+    <div id="baia-det-body"></div>
+  </div>
+  <div class="baia-grid-wrap" id="baia-grid"></div>
+</div>
+
+<!-- PALETES -->
+<div class="pg" id="pg-paletes">
+  <div class="legend">
+    <div class="li"><div class="ld" style="background:var(--pul);border:1px solid var(--pu)"></div>Ocupado</div>
+    <div class="li"><div class="ld" style="background:var(--s2);border:.5px solid var(--bd)"></div>Vazio</div>
+  </div>
+  <div class="card" id="pal-det" style="display:none;margin-bottom:9px;border-color:var(--pu)">
+    <div style="font-size:11px;font-weight:500;color:var(--pu);margin-bottom:7px">Palete selecionado</div>
+    <div id="pal-det-body"></div>
+  </div>
+  <div id="pal-grid"></div>
+</div>
+
+<!-- IMPORTAR -->
+<div class="pg" id="pg-importar">
+  <p class="st">Importar relatório de estoque</p>
+  <div class="upload-zone" id="upload-zone">
+    <input type="file" accept=".pdf,.csv,.xlsx,.xls,.txt" onchange="handleFile(this)">
+    <i class="ti ti-file-upload uz-icon" aria-hidden="true"></i>
+    <div class="uz-title">Selecionar arquivo</div>
+    <div class="uz-sub">PDF, CSV, Excel ou TXT · Relatório de controle de estoque</div>
+  </div>
+
+  <div id="imp-status" style="display:none">
+    <div class="card" id="imp-status-card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <i class="ti ti-file-text" aria-hidden="true" style="font-size:18px;color:var(--b)"></i>
+        <div>
+          <div style="font-size:13px;font-weight:500" id="imp-filename"></div>
+          <div style="font-size:11px;color:var(--m)" id="imp-fileinfo"></div>
+        </div>
+      </div>
+      <div id="imp-progress-wrap">
+        <div style="font-size:12px;color:var(--m);margin-bottom:6px" id="imp-progress-label">Processando com IA...</div>
+        <div style="height:4px;background:var(--s2);border-radius:2px;overflow:hidden">
+          <div id="imp-bar" style="height:100%;background:var(--g);border-radius:2px;width:0%;transition:width .4s"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="imp-preview" style="display:none">
+    <p class="st">Conversão de endereços</p>
+    <div class="card" style="padding:10px 13px;margin-bottom:10px">
+      <div style="font-size:11px;color:var(--m);margin-bottom:8px">Padrão antigo → novo sistema</div>
+      <div class="conv-row"><span class="conv-old">R01 · C03 · B02 · P1</span><i class="ti ti-arrow-right conv-arrow" aria-hidden="true"></i><span class="conv-new">N001 · B2 · P1</span></div>
+      <div style="font-size:10px;color:var(--m);margin-top:6px">Rua → N (coluna) · Coluna ignorada · Bandeja → B · Baia → P</div>
+    </div>
+
+    <p class="st">Prévia dos produtos importados</p>
+    <div style="overflow-x:auto">
+      <table class="imp-table" id="imp-table">
+        <thead><tr><th>SKU</th><th>Descrição</th><th>End. antigo</th><th>End. novo</th><th>Saldo</th><th></th></tr></thead>
+        <tbody id="imp-tbody"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button class="btn outline sm" onclick="cancelarImp()">Cancelar</button>
+      <button class="btn sm" style="flex:1" onclick="confirmarImp()" id="btn-confirmar">Importar todos</button>
+    </div>
+  </div>
+
+  <div id="imp-manual" style="margin-top:16px">
+    <p class="st">Ou adicionar produto manualmente</p>
+    <div class="fg"><label class="fi">SKU</label><input class="inp" type="text" id="man-sku" placeholder="ex: 10042"></div>
+    <div class="fg"><label class="fi">Descrição</label><input class="inp" type="text" id="man-desc" placeholder="ex: Paracetamol 750mg Cx100"></div>
+    <div class="fg"><label class="fi">Código de barras</label><input class="inp" type="text" id="man-ean" placeholder="7891234567890"></div>
+    <div class="frow">
+      <div class="fg"><label class="fi">Quantidade</label><input class="inp" type="number" id="man-qtd" placeholder="0"></div>
+      <div class="fg"><label class="fi">Estoque mínimo</label><input class="inp" type="number" id="man-min" placeholder="50"></div>
+    </div>
+    <p class="st">Endereço no sistema antigo</p>
+    <div class="frow" style="grid-template-columns:1fr 1fr 1fr 1fr">
+      <div class="fg"><label class="fi">Rua (R)</label><input class="inp" type="number" id="man-r" min="1" max="62" placeholder="01" oninput="updManAddr()"></div>
+      <div class="fg"><label class="fi">Coluna (C)</label><input class="inp" type="number" id="man-c" placeholder="01" oninput="updManAddr()"></div>
+      <div class="fg"><label class="fi">Bandeja (B)</label><input class="inp" type="number" id="man-b" min="1" max="6" placeholder="1" oninput="updManAddr()"></div>
+      <div class="fg"><label class="fi">Baia (P)</label><input class="inp" type="number" id="man-p" min="1" max="4" placeholder="1" oninput="updManAddr()"></div>
+    </div>
+    <div class="addr-box">
+      <div class="addr-lbl">Endereço convertido</div>
+      <div class="addr-big baia" id="man-addr-preview">—</div>
+      <div class="addr-lbl">N(Rua) · B(Bandeja) · P(Baia)</div>
+    </div>
+    <button class="btn" onclick="addManual()">Adicionar produto</button>
+  </div>
+</div>
+
+</div>
+
+<!-- SETUP MODAL -->
+<div class="setup-modal" id="setup-modal" style="display:none">
+  <div class="setup-box">
+    <h2>🔧 Configurar Firebase</h2>
+    <p>Para sincronizar dados na nuvem, você precisa de uma conta Firebase gratuita:</p>
+    <ol style="font-size:12px;color:var(--m);margin-bottom:16px;padding-left:20px;line-height:1.6">
+      <li>Abra <a href="https://firebase.google.com" target="_blank" style="color:var(--b)">firebase.google.com</a></li>
+      <li>Crie um novo projeto</li>
+      <li>Ative Realtime Database</li>
+      <li>Cole suas credenciais abaixo</li>
+    </ol>
+    <div class="fg">
+      <label class="fi">API Key</label>
+      <input class="inp" type="text" id="api-key" placeholder="AIza...">
+    </div>
+    <div class="fg">
+      <label class="fi">Project ID</label>
+      <input class="inp" type="text" id="project-id" placeholder="seu-projeto-123">
+    </div>
+    <div class="fg">
+      <label class="fi">Database URL</label>
+      <input class="inp" type="text" id="db-url" placeholder="https://seu-projeto.firebaseio.com">
+    </div>
+    <button class="btn" onclick="saveFirebaseConfig()">Salvar configurações</button>
+    <button class="btn outline" style="margin-top:8px;background:transparent;border:.5px solid var(--bd);color:var(--m)" onclick="useLocalStorage()">Usar apenas armazenamento local</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
